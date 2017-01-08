@@ -1,0 +1,188 @@
+Public rowCount As Integer
+Public rowCount2 As Integer
+
+
+Sub CSHCMON_GBP()
+'
+' CSHCMON_GBP Macro
+'
+
+    Worksheets("GBP").Activate
+    Range("A:A,B:B,C:C,D:D,E:E,H:H,J:J,K:K,L:L,M:M").Select
+    Selection.Delete Shift:=xlToLeft
+    Rows("1:1").Select
+    Selection.Delete Shift:=xlUp
+    Columns("A:A").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Columns("B:B").Select
+    Selection.Cut Destination:=Columns("G:G")
+    Columns("G:G").Select
+
+    'count rows
+    rowCount = Range("D65536").End(xlUp).Row
+    Range("A1", "G" & rowCount).Select
+    Selection.Copy
+
+    ActiveCell.Range("A" & rowCount + 1).Offset.PasteSpecial
+    For i = rowCount + 1 To rowCount + rowCount
+        Cells(i, 1).Value = "CSHCMON"
+    Next i
+
+    'Enter -1 in Cell 1, 10, select the cell, copy the cell
+    Cells(1, 10).Value = "-1"
+    Cells(1, 10).Select
+    Selection.Copy
+
+    'Select new C range
+    Range("C" & rowCount + 1, "C" & rowCount + rowCount).Select
+
+    'Divide by copied value
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
+        :=False, Transpose:=False
+
+    'Remove value in cell 1, 10
+    Cells(1, 10).Select
+    Application.CutCopyMode = False
+    Selection.ClearContents
+
+    'Select new C range and add decimal places
+    Range("C:C", "C" & rowCount + rowCount).Select
+    Selection.NumberFormat = "0.00"
+
+    'Enter last 2 digits of date, ledger number
+    For i = 1 To rowCount + rowCount
+        Cells(i, 5).Value = Right(Year(Date), 2)
+        Cells(i, 6).Value = "1"
+    Next i
+    
+       'copies account number from narrative and pastes into credit side
+    rowCount = Range("A65536").End(xlUp).Row
+    rowCount2 = (rowCount / 2)
+    Range("A1").Select
+    ActiveCell.FormulaR1C1 = "=MID(RC[6],7,8)"
+    Range("A1").Select
+    Selection.Copy
+    Range("A" & rowCount2, "A1").Select
+    ActiveSheet.Paste
+
+    'Move work to A5
+    Range("A1", "G" & rowCount + rowCount).Select
+    Selection.Cut
+    Cells(5, 1).Select
+    ActiveSheet.Paste
+
+    'Enter values at top
+    Cells(1, 1).Value = "Two Sided Journal"
+    Cells(2, 1).Value = "GBP"
+
+    Cells(3, 1).Value = "=TODAY()"
+
+    'Change =TODAY() formula to number value
+    Cells(3, 1).Select
+    Cells(3, 1).Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Selection.NumberFormat = "dd/mm/yyyy;@"
+
+
+
+'    ActiveWorkbook.SaveAs Filename:= _
+'    "S:\BankOps\Payment Processing\1 - Client Facing Services\Computershare Cheque Settlement (P & R)\CSH KYC Sweeps\GBP_" & Format(DateTime.Now, "YYYYMMDD HHMMSS") & ".csv", FileFormat:=xlCSV _
+'    , CreateBackup:=False
+'
+End Sub
+
+Sub CSHCMON_EUR()
+'
+' CSHCMON_EUR Macro
+'
+
+    Worksheets("EUR").Activate
+    Range("A:A,B:B,C:C,D:D,E:E,H:H,J:J,K:K,L:L,M:M").Select
+    Selection.Delete Shift:=xlToLeft
+    Rows("1:1").Select
+    Selection.Delete Shift:=xlUp
+    Columns("A:A").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Columns("B:B").Select
+    Selection.Cut Destination:=Columns("G:G")
+    Columns("G:G").Select
+
+    'count rows
+    rowCount = Range("D65536").End(xlUp).Row
+    Range("A1", "G" & rowCount).Select
+    Selection.Copy
+
+    ActiveCell.Range("A" & rowCount + 1).Offset.PasteSpecial
+    For i = rowCount + 1 To rowCount + rowCount
+        Cells(i, 1).Value = "CSHCMON"
+    Next i
+
+    'Enter -1 in Cell 1, 10, select the cell, copy the cell
+    Cells(1, 10).Value = "-1"
+    Cells(1, 10).Select
+    Selection.Copy
+
+    'Select new C range
+    Range("C" & rowCount + 1, "C" & rowCount + rowCount).Select
+
+    'Divide by copied value
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
+        :=False, Transpose:=False
+
+    'Remove value in cell 1, 10
+    Cells(1, 10).Select
+    Application.CutCopyMode = False
+    Selection.ClearContents
+
+    'Select new C range and add decimal places
+    Range("C:C", "C" & rowCount + rowCount).Select
+    Selection.NumberFormat = "0.00"
+
+    'Enter last 2 digits of date, ledger number
+    For i = 1 To rowCount + rowCount
+        Cells(i, 5).Value = Right(Year(Date), 2)
+        Cells(i, 6).Value = "1"
+    Next i
+
+    'copies account number from narrative and pastes into credit side
+    rowCount = Range("A65536").End(xlUp).Row
+    rowCount2 = (rowCount / 2)
+
+    Range("A1").Select
+    ActiveCell.FormulaR1C1 = "=MID(RC[6],7,8)"
+    Range("A1").Select
+    Selection.Copy
+    Range("A" & rowCount2, "A1").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+      :=False, Transpose:=False
+
+    'Move work to A5
+    Range("A1", "G" & rowCount + rowCount).Select
+    Selection.Cut
+    Cells(5, 1).Select
+    ActiveSheet.Paste
+
+    'Enter values at top
+    Cells(1, 1).Value = "Two Sided Journal"
+    Cells(2, 1).Value = "EUR"
+
+    Cells(3, 1).Value = "=TODAY()"
+
+    'Change =TODAY() formula to number value
+    Cells(3, 1).Select
+    Cells(3, 1).Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Selection.NumberFormat = "dd/mm/yyyy;@"
+
+
+    ActiveWorkbook.SaveAs Filename:= _
+    "S:\BankOps\Payment Processing\1 - Client Facing Services\Computershare Cheque Settlement (P & R)\CSH KYC Sweeps\EUR_" & Format(DateTime.Now, "YYYYMMDD HHMMSS") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+
+
+End Sub
+
+
+
