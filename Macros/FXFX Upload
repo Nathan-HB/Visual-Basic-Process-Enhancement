@@ -1,0 +1,295 @@
+Public rowCount As Integer
+Public ShName As String
+
+Sub Macro1()
+
+    Application.ScreenUpdating = False
+
+    If Sheets("Instructions").Cells(7, 4).Value = "19000100" Then
+        MsgBox ("No date added to Instructions sheet - macro will now close")
+        End
+    End If
+    iDate = Sheets("Instructions").Cells(7, 4).Value
+    Sheets("Data").Select
+    
+    Columns("I:I").Select
+    Selection.TextToColumns Destination:=Range("I1"), DataType:=xlDelimited, _
+        TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=True, _
+        Semicolon:=False, Comma:=False, Space:=False, Other:=False, FieldInfo _
+        :=Array(1, 1), TrailingMinusNumbers:=True
+    
+    IStart = Range("A60000").End(xlUp).Row
+    ActiveSheet.Range("$A$1:$J" & IStart).AutoFilter Field:=9, Criteria1:=">" & iDate
+    
+    Rows("1:" & IStart + 1).Delete
+    Rows("1:1").Insert
+    
+    IStart = Range("A60000").End(xlUp).Row
+        
+    Range("K2").Select
+    Selection.NumberFormat = "General"
+    ActiveCell.FormulaR1C1 = "=CONCATENATE(TRIM(RC[-7]),TRIM(RC[-6]),TRIM(RC[-5]))"
+    Range("K2").Select
+    Selection.AutoFill Destination:=Range("K2:K" & IStart)
+    Range("K2:K" & IStart).Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+
+    Columns("L:L").Cut
+    Columns("A:A").Insert Shift:=xlToRight
+    Columns("M:M").Cut
+    Columns("C:C").Insert Shift:=xlToRight
+    Columns("N:N").Cut
+    Columns("E:E").Insert Shift:=xlToRight
+    Columns("F:F").Delete Shift:=xlToLeft
+    Columns("I:I").Cut
+    Columns("F:F").Insert Shift:=xlToRight
+    Columns("N:N").Cut
+    Columns("G:G").Insert Shift:=xlToRight
+    Columns("O:O").Cut
+    Columns("H:H").Insert Shift:=xlToRight
+    Columns("I:K").Delete Shift:=xlToLeft
+    Columns("L:L").Cut
+    Columns("I:I").Insert Shift:=xlToRight
+    Columns("M:M").Cut
+    Columns("J:J").Insert Shift:=xlToRight
+    Columns("K:K").Delete Shift:=xlToLeft
+    Columns("M:Q").Cut
+    Columns("L:L").Insert Shift:=xlToRight
+    Range("R2").FormulaR1C1 = _
+        "=CONCATENATE(RIGHT(RC[-7],2),MID(RC[-7],5,2),MID(RC[-7],3,2))"
+    Range("R2").Select
+    Selection.AutoFill Destination:=Range("R2:R" & IStart)
+    Range("R2:R" & IStart).Select
+    Selection.Copy
+    Range("K2").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Columns("Q:R").Delete Shift:=xlToLeft
+
+    Range("Q2").Select
+    Selection.NumberFormat = "General"
+    ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[-13],LUT!R1C1:R9C2,2,0)"
+    Range("Q2").Select
+    Selection.AutoFill Destination:=Range("Q2:Q" & IStart)
+    Range("Q2:Q" & IStart).Select
+    Selection.Copy
+    Range("D2").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Columns("Q:Q").Delete Shift:=xlToLeft
+    Range("E2", "E" & IStart) = "FXFX"
+
+    Rows("1:1").ClearContents
+
+    Rows("2:" & IStart).Select
+    Selection.Copy
+    Range("A" & IStart + 1).Select
+    ActiveSheet.Paste
+    
+    Range("E" & IStart + 1, "E" & IStart + IStart - 1) = "FXSET"
+    Range("J2:J" & IStart + IStart - 1) = "1"
+    Range("B2:B" & IStart + IStart - 1) = "277"
+    Range("P2:P" & IStart + IStart - 1) = "JOURN"
+    For rownum = 2 To IStart * 2 - 1
+        If rownum < IStart + 1 Then
+        Cells(rownum, 6).Value = -Cells(rownum, 6).Value
+        End If
+        Cells(rownum, 7).Value = "FX SWEEP " + Cells(rownum, 11).Value
+        Cells(rownum, 15).Value = "FX SWEEP " + Cells(rownum, 11).Value
+    Next
+    
+
+
+IStart = Range("B60000").End(xlUp).Row
+
+    Columns("F:F").Select
+    Selection.NumberFormat = "0.00"
+    Cells.Select
+    Selection.AutoFilter
+    
+    
+    
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="AUD"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "AUD"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+    Sheets("Data").Select
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="GBP"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "GBP"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+    Sheets("Data").Select
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="USD"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "USD"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+    Sheets("Data").Select
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="EUR"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "EUR"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+    Sheets("Data").Select
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="HKD"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "HKD"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+    Sheets("Data").Select
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="SEK"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "SEK"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+    Sheets("Data").Select
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="CAD"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "CAD"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+    Sheets("Data").Select
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="SGD"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "SGD"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+    Sheets("Data").Select
+    ActiveSheet.Range("$A$1:$Y" & IStart).AutoFilter Field:=4, Criteria1:="CHF"
+    Range("B60000").End(xlUp).Select
+    If ActiveCell.Row = 1 Then
+    Else
+    Rows("1:" & IStart + 1).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    ActiveSheet.Paste
+    ActiveSheet.Name = "CHF"
+                ShName = ActiveSheet.Name
+            rowCount = Range("B65536").End(xlUp).Row
+            ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+            ActiveSheet.Range("1:1").Interior.ColorIndex = 7
+            ActiveWorkbook.SaveAs Filename:= _
+        "S:\BankOps\Payment Processing\2 - Operational Services\FX Reconciliation\FXFX Jnl100\2016\" & ShName & " " & Format(DateTime.Now, "DD.MM.YYYY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+    End If
+    
+Application.ScreenUpdating = True
+    
+End Sub
