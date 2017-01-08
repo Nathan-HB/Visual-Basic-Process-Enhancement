@@ -1,0 +1,326 @@
+Sub Macro1()
+'
+' Cash_OI_Report Macro
+
+Dim MyPath, MyFile, LatestFile, DateOne, DateTwo As String
+Dim wb1, wb2 As Workbook
+Dim ws As Worksheet
+Dim rowCount, rowCount2 As Double
+Dim LatestDate, LMD As Date
+Dim i, o As Integer
+
+'Disable screen updating and display alerts
+Application.ScreenUpdating = False
+Application.DisplayAlerts = False
+
+'Assign DateOne, DateTwo variables
+DateOne = Sheets("Sheet1").Range("D7").Value
+DateTwo = Sheets("Sheet1").Range("D9").Value
+
+'Specify the path to the folder where files are kept
+MyPath = "\\toronto1\HOME\PaymentServices\OI_PastSettlementReport\"
+  
+'Open the newest file and set those workbooks as variables
+Workbooks.Open MyPath & "OpenItems_" & DateOne & ".csv"
+Set wb1 = ActiveWorkbook
+
+'Open the newest file and set those workbooks as variables
+Workbooks.Open MyPath & "OpenItems_" & DateTwo & ".csv"
+Set wb2 = ActiveWorkbook
+
+'Activate second latest (yesterdays) file and adds "1" in column T
+rowCount = Range("A100000").End(xlUp).Row
+Range("T2", "T" & rowCount).Value = "1"
+
+'Activate latest (todays) file and copy data
+wb1.Activate
+Range("A1").Select
+Range(Selection, ActiveCell.SpecialCells(xlLastCell)).Select
+Selection.Copy
+
+'Paste latest (todays) file data below second latest (yesterdays) file data
+wb2.Activate
+rowCount = Range("A100000").End(xlUp).Row
+Range("A" & rowCount + 1).Select
+ActiveSheet.Paste
+
+'Quit todays Workbook
+wb1.Activate
+Application.DisplayAlerts = False
+ActiveWorkbook.Close
+Application.DisplayAlerts = True
+
+'Remove duplicates from Column G
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).RemoveDuplicates Columns:=7, Header:= _
+    xlNo
+
+'Apply Filter to Sheet and Remove "1" Rows
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=20, Criteria1:="1"
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Delete Shift:=xlUp
+Cells.Select
+Selection.AutoFilter
+
+'Assign orignal sheet to ws variable
+Set ws = ActiveSheet
+
+'Copy Data to new tab to allow standard "Sheet1" sheet name
+Cells.Select
+Selection.Copy
+Sheets.Add After:=ActiveSheet
+ActiveSheet.Paste
+
+'Delete original sheet
+Application.DisplayAlerts = False
+ws.Delete
+Application.DisplayAlerts = True
+
+'Set "Sheet1" as ws variable... Tired of typing "Sheet1" so many times
+Set ws = ActiveSheet
+
+'Filter on Column B and remove everything apart from 277
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=2, Criteria1:=Array( _
+"<>277"), Operator:=xlAnd
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Delete Shift:=xlUp
+Cells.Select
+Selection.AutoFilter
+
+'Creates new tab "Blank Clients" and copies header from "Sheet1" and pastes to the new tab
+Sheets.Add After:=ActiveSheet
+Sheets("Sheet2").Name = "Blank Clients"
+ws.Select
+Rows("1:1").Select
+Selection.Copy
+Sheets("Blank Clients").Select
+ActiveSheet.Paste
+ws.Select
+
+'Copy blank records from "Sheet1" Column C to "Blank Clients" tab and delete from "Sheet1"
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=3, Criteria1:="="
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Copy
+Sheets("Blank Clients").Select
+Range("A2").Select
+ActiveSheet.Paste
+ws.Select
+Application.CutCopyMode = False
+Selection.Delete Shift:=xlUp
+Cells.Select
+Selection.AutoFilter
+
+'Creates new tab "Non-Trade Related Postings" and copies header from "Sheet1" and pastes to the new tab
+Sheets.Add After:=ActiveSheet
+Sheets("Sheet3").Name = "Non-Trade Related Postings"
+ws.Select
+Rows("1:1").Select
+Selection.Copy
+Sheets("Non-Trade Related Postings").Select
+ActiveSheet.Paste
+ws.Select
+
+'Copy blank records from "Sheet1" Column I to Sheet "Non-Trade Related Postings"
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=9, Criteria1:="="
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Copy
+Sheets("Non-Trade Related Postings").Select
+Range("A2").Select
+ActiveSheet.Paste
+ws.Select
+Application.CutCopyMode = False
+Cells.Select
+Selection.AutoFilter
+
+'Deletes any "C" records from "Column J"
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=10, Criteria1:="C"
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Delete Shift:=xlUp
+
+'Deletes any "D" records from "Column J"
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=10, Criteria1:="D"
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Delete Shift:=xlUp
+
+'Deletes any "W" records from "Column J"
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=10, Criteria1:="W"
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Delete Shift:=xlUp
+Cells.Select
+Selection.AutoFilter
+
+'Deletes any blanks from column P
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=16, Criteria1:="="
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Delete Shift:=xlUp
+Cells.Select
+Selection.AutoFilter
+
+'Creates new tab "Internationals" and copies header from "Sheet1" and pastes to the new tab
+Sheets.Add After:=ActiveSheet
+Sheets("Sheet4").Name = "Internationals"
+ws.Select
+Rows("1:1").Select
+Selection.Copy
+Sheets("Internationals").Select
+ActiveSheet.Paste
+ws.Select
+
+'Copy & paste "International" records from "Sheet1" Column A and then deletes from "Sheet1"
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=1, Criteria1:= _
+    "Internationals"
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Copy
+Sheets("Internationals").Select
+Range("A2").Select
+ActiveSheet.Paste
+ws.Select
+Cells.Select
+Selection.AutoFilter
+
+'Creates new tab "Settled" and copies header from "Sheet1" and pastes to the new tab
+Sheets.Add After:=ActiveSheet
+Sheets("Sheet5").Name = "Settled"
+ws.Select
+Rows("1:1").Select
+Selection.Copy
+Sheets("Settled").Select
+ActiveSheet.Paste
+ws.Select
+
+'Creates new tab "Unsettled" and copies header from "Sheet1" and pastes to the new tab
+Sheets.Add After:=ActiveSheet
+Sheets("Sheet6").Name = "Unsettled"
+ws.Select
+Rows("1:1").Select
+Selection.Copy
+Sheets("Unsettled").Select
+ActiveSheet.Paste
+ws.Select
+
+'Differentiate between 589 and 892 Column P and sorts between Settled and Unsettled in Column L
+rowCount = Range("A100000").End(xlUp).Row
+rowCount2 = rowCount
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=16, Criteria1:="=589", _
+Operator:=xlOr, Criteria2:="=892"
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=12, Criteria1:="S"
+rowCount = Range("A100000").End(xlUp).Row
+
+    'If there are no results then do not copy and paste - too much blank data to copy and paste otherwise
+    If rowCount > 1 Then
+
+      Range("A2", "T" & rowCount).Select
+      Selection.Copy
+      Sheets("Settled").Select
+      Range("A2").Select
+      ActiveSheet.Paste
+      ws.Select
+
+    End If
+
+
+ActiveSheet.Range("A1", "T" & rowCount2).AutoFilter Field:=12, Criteria1:="N"
+rowCount = Range("A100000").End(xlUp).Row
+
+    If rowCount > 1 Then
+
+      Range("A2", "T" & rowCount).Select
+      Selection.Copy
+      Sheets("Unsettled").Select
+      Range("A2").Select
+      ActiveSheet.Paste
+      ws.Select
+
+    End If
+
+Cells.Select
+Selection.AutoFilter
+
+'Filters on everything apart from 589 and 892 on column P and sorts between settled and unsettlted and then deletes from sheet1
+rowCount = Range("A100000").End(xlUp).Row
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=16, Criteria1:="<>589", _
+Operator:=xlOr, Criteria2:="<>892"
+ActiveSheet.Range("A1", "T" & rowCount).AutoFilter Field:=11, Criteria1:=Array( _
+    "IIA", "IIC", "IIB", "IID"), Operator:=xlFilterValues
+
+    rowCount = Range("A100000").End(xlUp).Row
+    If rowCount > 1 Then
+
+      Rows("2:2").Select
+      Range(Selection, Selection.End(xlDown)).Select
+      Selection.Copy
+      Sheets("Unsettled").Select
+      rowCount = Range("A100000").End(xlUp).Row
+      Range("A" & rowCount + 1).Select
+      ActiveSheet.Paste
+      ws.Select
+
+    End If
+
+Cells.Select
+Selection.AutoFilter
+
+'Moves the rest of data from "Sheet1" to "Settled"
+Rows("2:2").Select
+Range(Selection, Selection.End(xlDown)).Select
+Selection.Copy
+Sheets("Settled").Select
+rowCount = Range("A100000").End(xlUp).Row
+ActiveCell.Range("A" & rowCount + 1).Select
+ActiveSheet.Paste
+ws.Select
+Range("A1").Select
+Application.CutCopyMode = False
+
+'SaveAs - No Prompt
+Application.DisplayAlerts = False
+ActiveWorkbook.SaveAs Filename:= _
+    "S:\BankOps\Payment Processing\2 - Operational Services\Control Services - Reporting\Open Items\Cash Open Item Report " & Format(DateTime.Now, "DDMMYY") & " - New Items" & ".xlsx", _
+    FileFormat:=xlOpenXMLWorkbook, CreateBackup:=False
+
+MsgBox "File successfully saved."
+
+Set OutApp = CreateObject("Outlook.Application")
+    Set OutMail = OutApp.CreateItem(0)
+
+    On Error Resume Next
+    With OutMail
+        .to = Range("B13").Value
+        .CC = Range("B14").Value
+        .BCC = ""
+        .Subject = Format(DateTime.Now, "DD.MM.YY") & "Cash Open Item Report"
+        .HTMLBody = .HTMLBody & "Good Morning," _
+        & "<br><br>Please find attached todays open item report" & "<br><br>Kind Regards,<br>Payment Services</font></span>"
+        .Attachments.Add ActiveWorkbook.FullName
+        'You can add other files also like this
+        '.Attachments.Add ("C:\test.txt")
+        .Display
+    End With
+    On Error GoTo 0
+
+    Set OutMail = Nothing
+    Set OutApp = Nothing
+
+ActiveWorkbook.Close SaveChanges:=False
+
+'
+End Sub
+
