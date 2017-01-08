@@ -1,0 +1,229 @@
+Public rowCount As Integer
+
+Sub CSHBANK()
+'
+' CSHBANK Macro
+'
+ Sheets("CSHBANK").Select
+    
+     'saves accurate data
+    ActiveWorkbook.SaveAs Filename:= _
+    "S:\BankOps\Payment Processing\1 - Client Facing Services\Cash Allocations\Funds Received Bankline Prints\BARCLAYS\2016\8.August\Barclays Accurate download " & Format(DateTime.Now, "DD.MM.YY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+  
+    Columns("K:K").Select
+    Selection.ClearContents
+ 
+    'deletes row 1
+    Rows("1:1").Select
+    Selection.Delete Shift:=xlUp
+    
+    'removes any last note text that is not 7 characters long
+    For rowCount = Range("I65536").End(xlUp).Row To 1 Step -1
+        If Len(Cells(rowCount, 9).Value) <> 7 Then
+            Rows(rowCount).EntireRow.Delete Shift:=xlUp
+        End If
+    Next rowCount
+
+    'reformat base data
+
+    Columns("A:F").Select
+    Selection.Delete Shift:=xlToLeft
+    Columns("A:A").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Columns("E:E").Select
+    Selection.Cut
+    Columns("A:A").Select
+    ActiveSheet.Paste
+    Columns("D:G").Select
+    Selection.ClearContents
+    
+ 'count rows and copy selection
+    rowCount = Range("C65536").End(xlUp).Row
+    Range("A1", "G" & rowCount).Select
+    Selection.Copy
+    
+    'Enter last 2 digits of date, ledger number, narrative
+    For i = 1 To rowCount
+        Cells(i, 4).Value = "*CASH"
+        Cells(i, 5).Value = Right(Year(Date), 2)
+        Cells(i, 6).Value = "1"
+        Cells(i, 7).Value = "Funds Received " & Format(DateTime.Now - 1, "DD/MM/YYYY")
+    Next i
+    
+    'paste selection into first blank cell in column A
+ActiveCell.Range("A" & rowCount + 1).Offset.PasteSpecial
+    
+    'change new column A data to "TDDIIRE"
+     For i = rowCount + 1 To rowCount + rowCount
+        Cells(i, 1).Value = "TDDIIRE"
+    Next i
+    
+    'Enter -1 in Cell 1, 10, select the cell, copy the cell
+    Cells(1, 10).Value = "-1"
+    Cells(1, 10).Select
+    Selection.Copy
+    
+    'Select new C range
+    ActiveSheet.Range("C" & rowCount + 1, "C" & rowCount + rowCount).Select
+    
+    'Divide by copied value
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
+        :=False, Transpose:=False
+    
+    'Remove value in cell 1, 10
+    Cells(1, 10).Select
+    Application.CutCopyMode = False
+    Selection.ClearContents
+    
+    'Select new C range and add decimal places
+    ActiveSheet.Range("C:C").Select
+    Selection.NumberFormat = "0.00"
+    
+    'Move work to A5
+    ActiveSheet.Range("A1", "G" & rowCount + rowCount).Select
+    Selection.Cut
+    Cells(5, 1).Select
+    ActiveSheet.Paste
+    
+    TodayDate = Format(DateTime.Now, "DD/MM/YYYY")
+    
+    'Enter values at top
+    Cells(1, 1).Value = "Two Sided Journal"
+    Cells(2, 1).Value = "EUR"
+    Range("A3").Select
+    Selection.NumberFormat = "@"
+    Cells(3, 1).Value = TodayDate
+    
+    'Change =TODAY() formula to number value
+    Cells(3, 1).Select
+    Cells(3, 1).Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Selection.NumberFormat = "dd/mm/yyyy;@"
+    
+    'clear all contents from H and I column
+    Columns("H:I").Select
+    Selection.Clear
+    
+    ActiveWorkbook.SaveAs Filename:= _
+    "S:\BankOps\Payment Processing\1 - Client Facing Services\Cash Allocations\CPW consignments\CPW UPLOAD BARCLAYS", FileFormat:=xlCSV _
+    , CreateBackup:=False
+
+End Sub
+
+
+Sub TDDIIRE()
+'
+' TDDIIRE Macro
+'
+    Sheets("TDDIIRE").Select
+
+    'saves accurate data
+    ActiveWorkbook.SaveAs Filename:= _
+    "S:\BankOps\Payment Processing\1 - Client Facing Services\Cash Allocations\Funds Received Bankline Prints\TDDIIRE\TDDIIRE Accurate download " & Format(DateTime.Now, "DD.MM.YY") & ".csv", FileFormat:=xlCSV _
+    , CreateBackup:=False
+
+    Columns("K:K").Select
+    Selection.ClearContents
+ 
+    'deletes row 1
+    Rows("1:1").Select
+    Selection.Delete Shift:=xlUp
+    
+    'removes any last note text that is not 7 characters long
+    For rowCount = Range("I65536").End(xlUp).Row To 1 Step -1
+        If Len(Cells(rowCount, 9).Value) <> 7 Then
+            Rows(rowCount).EntireRow.Delete Shift:=xlUp
+        End If
+    Next rowCount
+
+    'reformat base data
+
+    Columns("A:F").Select
+    Selection.Delete Shift:=xlToLeft
+    Columns("A:A").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Columns("E:E").Select
+    Selection.Cut
+    Columns("A:A").Select
+    ActiveSheet.Paste
+    Columns("D:G").Select
+    Selection.ClearContents
+    
+ 'count rows and copy selection
+    rowCount = Range("C65536").End(xlUp).Row
+    Range("A1", "G" & rowCount).Select
+    Selection.Copy
+    
+    'Enter last 2 digits of date, ledger number, narrative
+    For i = 1 To rowCount
+        Cells(i, 4).Value = "*CASH"
+        Cells(i, 5).Value = Right(Year(Date), 2)
+        Cells(i, 6).Value = "1"
+        Cells(i, 7).Value = "Funds Received " & Format(DateTime.Now - 1, "DD/MM/YYYY")
+    Next i
+    
+    'paste selection into first blank cell in column A
+ActiveCell.Range("A" & rowCount + 1).Offset.PasteSpecial
+    
+    'change new column A data to "TDDIIRE"
+     For i = rowCount + 1 To rowCount + rowCount
+        Cells(i, 1).Value = "TDDIIRE"
+    Next i
+    
+    'Enter -1 in Cell 1, 10, select the cell, copy the cell
+    Cells(1, 10).Value = "-1"
+    Cells(1, 10).Select
+    Selection.Copy
+    
+    'Select new C range
+    ActiveSheet.Range("C" & rowCount + 1, "C" & rowCount + rowCount).Select
+    
+    'Divide by copied value
+    Selection.PasteSpecial Paste:=xlPasteAll, Operation:=xlDivide, SkipBlanks _
+        :=False, Transpose:=False
+    
+    'Remove value in cell 1, 10
+    Cells(1, 10).Select
+    Application.CutCopyMode = False
+    Selection.ClearContents
+    
+    'Select new C range and add decimal places
+    ActiveSheet.Range("C:C").Select
+    Selection.NumberFormat = "0.00"
+    
+    'Move work to A5
+    ActiveSheet.Range("A1", "G" & rowCount + rowCount).Select
+    Selection.Cut
+    Cells(5, 1).Select
+   
+    ActiveSheet.Paste
+    
+    TodayDate = Format(DateTime.Now, "DD/MM/YYYY")
+    
+    'Enter values at top
+    Cells(1, 1).Value = "Two Sided Journal"
+    Cells(2, 1).Value = "EUR"
+    Range("A3").Select
+    Selection.NumberFormat = "@"
+    Cells(3, 1).Value = TodayDate
+    
+    'Change =TODAY() formula to number value
+    Cells(3, 1).Select
+    Cells(3, 1).Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Selection.NumberFormat = "dd/mm/yyyy;@"
+    
+    'clear all contents from H and I column
+    Columns("H:I").Select
+    Selection.Clear
+    
+    ActiveWorkbook.SaveAs Filename:= _
+    "S:\BankOps\Payment Processing\1 - Client Facing Services\Cash Allocations\CPW consignments\CPW UPLOAD TDDIIRE", FileFormat:=xlCSV _
+    , CreateBackup:=False
+
+End Sub
