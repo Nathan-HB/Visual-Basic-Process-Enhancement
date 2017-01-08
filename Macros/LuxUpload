@@ -1,0 +1,52 @@
+Sub fileSearch()
+'
+Dim currentDate1, currentDate2, currentDate3, currentDate4, MyPath, MyFile As String
+Dim fileLoop As Integer
+Dim wbO, wb As Workbook
+Dim fileArray, dateArray As Variant
+
+Application.DisplayAlerts = False
+Application.ScreenUpdating = False
+
+'Declare currentDate
+currentDate1 = Range("B6").Value
+currentDate2 = Range("B8").Value
+currentDate3 = Range("B10").Value
+currentDate4 = Range("B12").Value
+
+fileArray = Array("BEHULULI", "FELULUL", "BHLULUL", "GZLULUL")
+dateArray = Array(currentDate1, currentDate2, currentDate3, currentDate4)
+
+Set wbO = ActiveWorkbook
+
+'Declare Path
+MyPath = "C:\Users\Nathan\Desktop\work\fileSearch\files\"
+
+'Loops 4 times, cycles through both arrays
+For fileLoop = 0 To 3
+    'Build file location
+    MyFile = Dir(MyPath & "bookKeeping-" & fileArray(fileLoop) & "-" & dateArray(fileLoop) & "*xlsx")
+        'Open File
+        If MyFile <> "" Then
+                'Open Workbook
+                Workbooks.Open MyPath & MyFile
+            Else
+                'If MyPath & MyFile does not create a valid Dir Path
+                MsgBox "File does not exist"
+                    Exit Sub
+        End If
+    Set wb1 = ActiveWorkbook
+        Cells.Select
+        Selection.Copy
+        wbO.Activate
+        Application.Sheets(fileLoop + 2).Visible = True
+        Sheets(fileLoop + 2).Select
+        Range("A1").Select
+        ActiveSheet.Paste
+    wb1.Close False
+Next fileLoop
+
+'
+End Sub
+
+
