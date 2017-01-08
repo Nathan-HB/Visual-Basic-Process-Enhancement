@@ -1,0 +1,107 @@
+Public rowCount As Integer
+
+Sub Macro1()
+
+' Macro1 Macro
+
+        'adds second sheet
+    Sheets.Add After:=ActiveSheet
+    Sheets(1).Activate
+    Cells.Select
+    Selection.Copy
+    Sheets(2).Activate
+    ActiveSheet.Paste
+
+       'deletes headers
+    Rows("1:1").Select
+    Selection.Delete Shift:=xlUp
+
+        'counts number of rows in column A
+    rowCount = Range("A65536").End(xlUp).Row
+
+        'moves all data to D1
+    Columns("A:J").Select
+    Selection.Cut
+    Range("D1").Select
+    ActiveSheet.Paste
+
+        'colour column A to row count to allow black cells in csv format
+    ActiveSheet.Range("A1", "A" & rowCount).Interior.ColorIndex = 7
+    
+       'moves E1 to I1
+    Columns("E:M").Select
+    Selection.Cut
+    Range("I1").Select
+    ActiveSheet.Paste
+
+        'Moves J1 to N1
+    Columns("J:Q").Select
+    Selection.Cut
+    Range("N1").Select
+    ActiveSheet.Paste
+
+         'concatenate sortcode and account number into correct format
+    rowCount = Range("I65536").End(xlUp).Row
+    Columns("N:N").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Range("N1").Select
+    ActiveCell.FormulaR1C1 = "0"
+    Selection.Copy
+    Range("N1", "N" & rowCount).Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Range("M1").Select
+    ActiveCell.FormulaR1C1 = "=CONCATENATE(RC[1],RC[2],RC[3])"
+    Selection.Copy
+    Range("M1", "M" & rowCount).Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Columns("N:P").Select
+    Application.CutCopyMode = False
+    Selection.Delete Shift:=xlToLeft
+
+        'moves N1 to Q1
+    Columns("N:S").Select
+    Selection.Cut
+    Range("Q1").Select
+    ActiveSheet.Paste
+
+        'moves R1 to S1
+    Columns("R:V").Select
+    Selection.Cut
+    Range("S1").Select
+    ActiveSheet.Paste
+    
+        'format Col S as custom date
+    Columns("S:S").Select
+    Selection.NumberFormat = "ddmmyyyy"
+    
+        'moves T1 to Y1
+    Columns("T:W").Select
+    Selection.Cut
+    Range("Y1").Select
+    ActiveSheet.Paste
+    
+        'moves Z1 to AE1
+    Columns("Z:AB").Select
+    Selection.Cut
+    Range("AE1").Select
+    ActiveSheet.Paste
+    
+        'moves AF1 to AG1
+    Columns("AF:AG").Select
+    Selection.Cut
+    Range("AG1").Select
+    ActiveSheet.Paste
+    
+        'moves AH1 to AK1
+    Columns("AH:AH").Select
+    Selection.Cut
+    Range("AK1").Select
+    ActiveSheet.Paste
+    
+        'colour column CB to row count to allow black cells in csv format
+    ActiveSheet.Range("CB1", "CB" & rowCount).Interior.ColorIndex = 7
+    
+    
+End Sub
