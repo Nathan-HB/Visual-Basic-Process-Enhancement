@@ -1,0 +1,58 @@
+Sub Macro1()
+'
+' Macro1 Macro
+'
+Dim rowCount As Double
+
+    'Create new sheet called 10433442
+    Sheets.Add After:=ActiveSheet
+    ActiveSheet.Name = "10433442"
+        
+    'Create new sheet called 47468943
+    Sheets.Add After:=ActiveSheet
+    ActiveSheet.Name = "47468943"
+    
+    'Create new sheet called 56142783
+    Sheets.Add After:=ActiveSheet
+    ActiveSheet.Name = "56142783"
+    
+    'Create new sheet called 98678152
+    Sheets.Add After:=ActiveSheet
+    ActiveSheet.Name = "98678152"
+    
+    'Create new sheet called 47469173
+    Sheets.Add After:=ActiveSheet
+    ActiveSheet.Name = "47469173"
+    
+    'Create new sheet called 56143753
+    Sheets.Add After:=ActiveSheet
+    ActiveSheet.Name = "56143753"
+    
+    'Returned to original sheet and apply filter
+    Sheets(1).Select
+    Rows("1:1").Select
+    Selection.AutoFilter
+    
+    
+    'Filter on column U and value "10433442" and copy/paste records into same named tab
+    'Filter on column U and value "47468943" and copy/paste records into same named tab
+    'Filter on column U and value "56142783" and copy/paste records into same named tab
+    'Filter on column U and value "98678152" and copy/paste records into same named tab
+    'Filter on column U and value "47469173" and copy/paste records into same named tab
+    rowCount = Range("A65536").End(xlUp).Row
+    ActiveSheet.Range("A1" & "AU" & rowCount).AutoFilter Field:=21, Criteria1:= _
+        "47469173"
+    rowCount = Range("A65536").End(xlUp).Row
+    Range("A1", "AU" & rowCount).Select
+    Selection.Copy
+    Sheet("47469173").Select
+    ActiveSheet.Paste
+    Range("A" & rowCount + 2).FormulaR1C1 = "=SUM(C[13])"
+    Range("A" & rowCount + 3).FormulaR1C1 = "=COUNT(C[13])"
+        
+    'Filter on column U and value "56143753" and copy/paste records into same named tab
+    
+    
+    
+    
+End Sub
