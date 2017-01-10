@@ -1,11 +1,30 @@
 Sub BenchMarks()
 
-Dim rowCount, createSheets, accountFilter, sheetSums As Double
+Dim rowCount, createSheets, accountFilter, sheetSums, sheetCopyLoop, sheetCount, dateRow As Double
 Dim sheetArrayString, sheetArrayInt As Variant
 Dim shO As Worksheet
+Dim FSwb, BMwb As Workbook
 
 Set shO = ActiveSheet
+Set FSwb = ActiveWorkbook
 
+rowCount = Range("A65536").End(xlUp).Row
+Columns("H:H").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+Range("G1").Copy
+Range("H1").Select
+ActiveSheet.Paste
+Range("H2").Select
+ActiveCell.FormulaR1C1 = _
+    "=CONCATENATE(RIGHT(RC[-1],2),""/"",MID(RC[-1],3,2),""/"",LEFT(RC[-1],2))"
+Selection.AutoFill Destination:=Range("H2:H" & rowCount)
+
+    Columns("H:H").Copy
+    Columns("H:H").Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+        
+Columns("G:G").Delete Shift:=xlToLeft
+    
 sheetArrayString = Array("10433442", "47468943", "56142783", "98678152", "47469173", "56143753")
 sheetArrayInt = Array(10433442, 47468943, 56142783, 98678152, 47469173, 56143753)
 
@@ -45,10 +64,33 @@ For sheetSums = 0 To 5
                 Range("A" & rowCount + 3).FormulaR1C1 = "=COUNT(C[13])"
                     Range("B" & rowCount + 3).Value = "Number of Payments"
             Else
-                Application.DisplayAlerts = False
-                    ActiveSheet.Delete
-                Application.DisplayAlerts = True
             End If
 Next sheetSums
+
+sheetArrayString = Array("56143753", "47469173", "98678152", "56142783", "47468943", "10433442")
+sheetArrayInt = Array(56143753, 47469173, 98678152, 56142783, 47468943, 10433442)
+
+sheetCount = Sheets.Count
+
+Workbooks.Open ("\\tdukldsnas01\backoffice\Benchmarks\MI 2016 - 2017\Benchmarks - Reconciliations - v1.xlsx")
+Set BMwb = ActiveWorkbook
+
+For sheetCopyLoop = 0 To 5
+    FSwb.Activate
+        Sheets(sheetArrayString(sheetCopy)).Select
+            If Range("G2").Value <> "" Then
+                BMwb.Activate
+
+            Else
+            End If
+Next sheetCopyLoop
+
+
+
+
+
+
+
+
 
 End Sub
