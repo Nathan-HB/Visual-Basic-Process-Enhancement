@@ -1,9 +1,12 @@
 Sub BenchMarks()
 
+Application.ScreenUpdating = False
+
 Dim rowCount, createSheets, accountFilter, sheetSums, sheetCopyLoop, sheetCount, dateRow As Double
 Dim sheetArrayString, sheetArrayInt As Variant
 Dim shO As Worksheet
 Dim FSwb, BMwb As Workbook
+Dim rCell, rRng As Range
 
 Set shO = ActiveSheet
 Set FSwb = ActiveWorkbook
@@ -70,17 +73,50 @@ Next sheetSums
 sheetArrayString = Array("56143753", "47469173", "98678152", "56142783", "47468943", "10433442")
 sheetArrayInt = Array(56143753, 47469173, 98678152, 56142783, 47468943, 10433442)
 
-sheetCount = Sheets.Count
-
 Workbooks.Open ("\\tdukldsnas01\backoffice\Benchmarks\MI 2016 - 2017\Benchmarks - Reconciliations - v1.xlsx")
 Set BMwb = ActiveWorkbook
 
 For sheetCopyLoop = 0 To 5
     FSwb.Activate
-        Sheets(sheetArrayString(sheetCopy)).Select
+        Sheets(sheetArrayString(sheetCopyLoop)).Select
             If Range("G2").Value <> "" Then
                 BMwb.Activate
-
+                    Set rRng = Sheets("Reconciliations").Range("A5:A1039")
+                        For Each rCell In rRng.Cells
+                            If rCell.Value = FSwb.Range("G2").Value Then
+                                rowCount = Range("A65536").End(xlUp).Row
+                                    FSwb.Range("A" & rowCount + 2).Copy
+                                        If sheetArrayString(sheetCopyLoop) = "56143753" Then
+                                            BMwb.Range(rCell, 12).Select
+                                                ActiveSheet.Paste
+                                        Else
+                                            If sheetArrayString(sheetCopyLoop) = "47469173" Then
+                                                BMwb.Range(rCell, 11).Select
+                                                    ActiveSheet.Paste
+                                            Else
+                                                If sheetArrayString(sheetCopyLoop) = "98678152" Then
+                                                    BMwb.Range(rCell, 10).Select
+                                                        ActiveSheet.Paste
+                                                Else
+                                                    If sheetArrayString(sheetCopyLoop) = "56142783" Then
+                                                        BMwb.Range(rCell, 9).Select
+                                                            ActiveSheet.Paste
+                                                    Else
+                                                        If sheetArrayString(sheetCopyLoop) = "47468943" Then
+                                                            BMwb.Range(rCell, 8).Select
+                                                                ActiveSheet.Paste
+                                                        Else
+                                                            If sheetArrayString(sheetCopyLoop) = "10433442" Then
+                                                                BMwb.Range(rCell, 7).Select
+                                                                    ActiveSheet.Paste
+                                                            End If
+                                                        End If
+                                                    End If
+                                                End If
+                                            End If
+                                        End If
+                            End If
+                        Next rCell
             Else
             End If
 Next sheetCopyLoop
