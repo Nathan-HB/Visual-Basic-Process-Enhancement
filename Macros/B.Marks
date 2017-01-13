@@ -7,6 +7,7 @@ Dim sheetArrayString, sheetArrayInt As Variant
 Dim shO As Worksheet
 Dim FSwb, BMwb As Workbook
 Dim rCell, rRng As Range
+Dim FSwbDate As Date
 
 Set shO = ActiveSheet
 Set FSwb = ActiveWorkbook
@@ -28,17 +29,17 @@ Selection.AutoFill Destination:=Range("H2:H" & rowCount)
         
 Columns("G:G").Delete Shift:=xlToLeft
     
-sheetArrayString = Array("10433442", "47468943", "56142783", "98678152", "47469173", "56143753")
-sheetArrayInt = Array(10433442, 47468943, 56142783, 98678152, 47469173, 56143753)
+sheetArrayString = Array("10433442", "47468943", "98678152", "47469173", "56143753")
+sheetArrayInt = Array(10433442, 47468943, 98678152, 47469173, 56143753)
 
-For createSheets = 0 To 5
+For createSheets = 0 To 4
     Sheets.Add.Name = sheetArrayString(createSheets)
 Next createSheets
 
 shO.Move before:=Worksheets(1)
     Rows("1:1").AutoFilter
 
-For accountFilter = 0 To 5
+For accountFilter = 0 To 4
     rowCount = Range("A65536").End(xlUp).Row
         ActiveSheet.Range("A1:AU" & rowCount).AutoFilter Field:=21, Criteria1:= _
             sheetArrayInt(accountFilter)
@@ -58,7 +59,7 @@ Application.DisplayAlerts = False
     shO.Delete
 Application.DisplayAlerts = True
 
-For sheetSums = 0 To 5
+For sheetSums = 0 To 4
     Sheets(sheetArrayString(sheetSums)).Select
         rowCount = Range("A65536").End(xlUp).Row
             If Range("A2") <> "" Then
@@ -70,63 +71,120 @@ For sheetSums = 0 To 5
             End If
 Next sheetSums
 
-sheetArrayString = Array("56143753", "47469173", "98678152", "56142783", "47468943", "10433442")
-sheetArrayInt = Array(56143753, 47469173, 98678152, 56142783, 47468943, 10433442)
+sheetArrayString = Array("56143753", "47469173", "98678152", "47468943", "10433442")
+sheetArrayInt = Array(56143753, 47469173, 98678152, 47468943, 10433442)
 
 Workbooks.Open ("\\tdukldsnas01\backoffice\Benchmarks\MI 2016 - 2017\Benchmarks - Reconciliations - v1.xlsx")
 Set BMwb = ActiveWorkbook
 
-For sheetCopyLoop = 0 To 5
+Set rRng = BMwb.Sheets("Reconciliations").Range("A5:A1039")
+dateRow = 4
+For Each rCell In rRng.Cells
+    If rCell = FSwbDate Then
+    Else
+        dateRow = dateRow + 1
+    End If
+Next rCell
+
+
+For sheetCopyLoop = 0 To 4
     FSwb.Activate
         Sheets(sheetArrayString(sheetCopyLoop)).Select
             If Range("G2").Value <> "" Then
-                BMwb.Activate
-                    Set rRng = Sheets("Reconciliations").Range("A5:A1039")
-                        For Each rCell In rRng.Cells
-                            If rCell.Value = FSwb.Range("G2").Value Then
-                                rowCount = Range("A65536").End(xlUp).Row
-                                    FSwb.Range("A" & rowCount + 2).Copy
-                                        If sheetArrayString(sheetCopyLoop) = "56143753" Then
-                                            BMwb.Range(rCell, 12).Select
-                                                ActiveSheet.Paste
-                                        Else
-                                            If sheetArrayString(sheetCopyLoop) = "47469173" Then
-                                                BMwb.Range(rCell, 11).Select
-                                                    ActiveSheet.Paste
+                FSwbDate = ActiveSheet.Range("G2").Value
+                    BMwb.Activate
+                            
+                                FSwb.Activate
+                                    rowCount = Range("A65536").End(xlUp).Row
+                                        Range("A" & rowCount - 1).Copy
+                                If sheetArrayString(sheetCopyLoop) = "56143753" Then
+                                        BMwb.Activate
+                                            Cells(dateRow, 11).Select
+                                                Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                    :=False, Transpose:=False
+                                                        FSwb.Activate
+                                                           Range("A" & rowCount).Copy
+                                                                BMwb.Activate
+                                                                    Cells(dateRow, 8).Select
+                                                                        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                                            :=False, Transpose:=False
+                                                                                FSwb.Activate
+                                Else
+                                End If
+                                    If sheetArrayString(sheetCopyLoop) = "47469173" Then
+                                        BMwb.Activate
+                                            Cells(dateRow, 13).Select
+                                                Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                    :=False, Transpose:=False
+                                                        FSwb.Activate
+                                                           Range("A" & rowCount).Copy
+                                                                BMwb.Activate
+                                                                    Cells(dateRow, 7).Select
+                                                                        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                                            :=False, Transpose:=False
+                                                                                FSwb.Activate
+                                Else
+                                End If
+                                    If sheetArrayString(sheetCopyLoop) = "98678152" Then
+                                        BMwb.Activate
+                                            Cells(dateRow, 12).Select
+                                                Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                    :=False, Transpose:=False
+                                                        FSwb.Activate
+                                                           Range("A" & rowCount).Copy
+                                                                BMwb.Activate
+                                                                    Cells(dateRow, 6).Select
+                                                                        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                                            :=False, Transpose:=False
+                                                                                FSwb.Activate
+                                    Else
+                                    End If
+                                        If sheetArrayString(sheetCopyLoop) = "56142783" Then
+                                            BMwb.Activate
+                                                Cells(dateRow, 11).Select
+                                                    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                        :=False, Transpose:=False
+                                                            FSwb.Activate
+                                                               Range("A" & rowCount).Copy
+                                                                    BMwb.Activate
+                                                                        Cells(dateRow, 5).Select
+                                                                            Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                                                :=False, Transpose:=False
+                                                                                    FSwb.Activate
                                             Else
-                                                If sheetArrayString(sheetCopyLoop) = "98678152" Then
-                                                    BMwb.Range(rCell, 10).Select
-                                                        ActiveSheet.Paste
-                                                Else
-                                                    If sheetArrayString(sheetCopyLoop) = "56142783" Then
-                                                        BMwb.Range(rCell, 9).Select
-                                                            ActiveSheet.Paste
-                                                    Else
-                                                        If sheetArrayString(sheetCopyLoop) = "47468943" Then
-                                                            BMwb.Range(rCell, 8).Select
-                                                                ActiveSheet.Paste
-                                                        Else
-                                                            If sheetArrayString(sheetCopyLoop) = "10433442" Then
-                                                                BMwb.Range(rCell, 7).Select
-                                                                    ActiveSheet.Paste
-                                                            End If
-                                                        End If
-                                                    End If
-                                                End If
                                             End If
-                                        End If
-                            End If
-                        Next rCell
-            Else
-            End If
+                                                If sheetArrayString(sheetCopyLoop) = "47468943" Then
+                                                    BMwb.Activate
+                                                        Cells(dateRow, 10).Select
+                                                            Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                                :=False, Transpose:=False
+                                                                    FSwb.Activate
+                                                                       Range("A" & rowCount).Copy
+                                                                            BMwb.Activate
+                                                                                Cells(dateRow, 4).Select
+                                                                                    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                                                        :=False, Transpose:=False
+                                                                                            FSwb.Activate
+                                                Else
+                                                End If
+                                                    If sheetArrayString(sheetCopyLoop) = "10433442" Then
+                                                        BMwb.Activate
+                                                            Cells(dateRow, 9).Select
+                                                                Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                                    :=False, Transpose:=False
+                                                                        FSwb.Activate
+                                                                           Range("A" & rowCount).Copy
+                                                                                BMwb.Activate
+                                                                                    Cells(dateRow, 3).Select
+                                                                                        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                                                                                            :=False, Transpose:=False
+                                                                                                FSwb.Activate
+                                                    Else
+                                                    End If
+                            
+        Else
+        End If
 Next sheetCopyLoop
-
-
-
-
-
-
-
 
 
 End Sub
