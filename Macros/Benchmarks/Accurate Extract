@@ -1,0 +1,56 @@
+Sub Accurate_Extract()
+
+Dim rowCount, findString As Double
+Dim rCell, rRng As Range
+Dim currentDate As String
+
+rowCount = Range("A100000").End(xlUp).Row
+Sheets.Add After:=Sheets(1)
+Sheets(1).Activate
+    Range("B1").FormulaR1C1 = "=R[1]C-2"
+    currentDate = Range("B1").Value
+        Range("H2").FormulaR1C1 = "=ISNUMBER(SEARCH(""TD DIRECT INVESTINMV"",RC[-3]))"
+        Range("H2").Copy
+        Range("H2", "H" & rowCount).Select
+        ActiveSheet.Paste
+        Selection.Copy
+            Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+                :=False, Transpose:=False
+
+Set rRng = Range("H1", "H" & rowCount)
+    For Each rCell In rRng.Cells
+        If Cells(rowCount, 8).Value = "True" Then
+            Rows(rowCount).Copy
+                Sheets(2).Select
+                    ActiveSheet.Paste
+                        Sheets(1).Select
+                            Exit For
+        Else
+            rowCount = rowCount - 1
+        End If
+    Next rCell
+
+Range("H2").Select
+Selection.FormulaR1C1 = "=ISNUMBER(SEARCH(""MVNWB CC"",RC[-3]))"
+Selection.Copy
+rowCount = Range("A100000").End(xlUp).Row
+Range("H2", "H" & rowCount).Select
+ActiveSheet.Paste
+
+For Each rCell In rRng.Cells
+    If Cells(rowCount, 8) = "True" Then
+        Rows(rowCount).Copy
+            Sheets(2).Select
+                rowCount = Range("A100000").End(xlUp).Row
+                    Range("A" & rowCount + 1).Select
+                        ActiveSheet.Paste
+                            Sheets(1).Select
+                                Exit For
+    Else
+        rowCount = rowCount - 1
+    End If
+Next rCell
+
+End Sub
+
+
