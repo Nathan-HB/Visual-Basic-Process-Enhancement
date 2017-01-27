@@ -1,31 +1,39 @@
-Sub fileSearch()
-'
+Sub file_search()
+
+
+Dim iend, cashbook
 Dim currentDate1, currentDate2, currentDate3, currentDate4, MyPath, MyFile As String
 Dim fileLoop As Integer
 Dim wbO, wb As Workbook
 Dim fileArray, dateArray As Variant
+Dim OutApp, OutMail As Object
+Dim imageRange As Range
+Dim rowCount As Double
 
-Application.DisplayAlerts = False
+Set OutApp = CreateObject("Outlook.Application")
+
+'The new addition to this script will open the 4 LUX Statement files and copy them into the correct tabs in the Excel Doc.
 Application.ScreenUpdating = False
+Application.DisplayAlerts = False
 
 'Declare currentDate
-currentDate1 = Range("B6").Value
-currentDate2 = Range("B8").Value
-currentDate3 = Range("B10").Value
-currentDate4 = Range("B12").Value
+currentDate1 = Range("C12").Value
+currentDate2 = Range("C14").Value
+currentDate3 = Range("C16").Value
+currentDate4 = Range("C18").Value
 
-fileArray = Array("BEHULULI", "FELULUL", "BHLULUL", "GZLULUL")
+fileArray = Array("BGLLLULL", "CELLLULL", "BBRUBEBB", "BLUXLULL")
 dateArray = Array(currentDate1, currentDate2, currentDate3, currentDate4)
 
 Set wbO = ActiveWorkbook
 
 'Declare Path
-MyPath = "C:\Users\Nathan\Desktop\work\fileSearch\files\"
+MyPath = "\\tdwh-mpact-v1\process\CARS\INTERNAXX FILES\STATEMENTS\"
 
-'Loops 4 times, cycles through both arrays
+'Loops 4 times, cycles through both arrays, builds 4 directory locations of fileArray item & dateArray item
 For fileLoop = 0 To 3
     'Build file location
-    MyFile = Dir(MyPath & "bookKeeping-" & fileArray(fileLoop) & "-" & dateArray(fileLoop) & "*xlsx")
+    MyFile = Dir(MyPath & "Balance-" & fileArray(fileLoop) & "-" & dateArray(fileLoop) & "*xlsx")
         'Open File
         If MyFile <> "" Then
                 'Open Workbook
@@ -39,14 +47,67 @@ For fileLoop = 0 To 3
         Cells.Select
         Selection.Copy
         wbO.Activate
-        Application.Sheets(fileLoop + 2).Visible = True
-        Sheets(fileLoop + 2).Select
+        Application.Sheets(fileLoop + 4).Visible = True
+        Sheets(fileLoop + 4).Select
         Range("A1").Select
         ActiveSheet.Paste
     wb1.Close False
 Next fileLoop
-
-'
+  
 End Sub
 
 
+Function imageToOutlook(imageRange As Range)
+
+Dim fso As Object
+Dim ts As Object
+Dim TempFile As String
+Dim TempWB As Workbook
+
+'Create a tempory file directory/file
+TempFile = Environ$("temp") & "/" & Format(Now, "dd-mm-yy h-mm-ss") & ".htm"
+
+' Copy the range and create a temp workbook that will receive the data.
+imageRange.Copy
+Set TempWB = Workbooks.Add(1)
+With TempWB.Sheets(1)
+    .Cells(1).PasteSpecial Paste:=8
+    .Cells(1).PasteSpecial xlPasteValues, , False, False
+    .Cells(1).PasteSpecial xlPasteFormats, , False, False
+    .Cells(1).Select
+    Application.CutCopyMode = False
+    On Error Resume Next
+    .DrawingObjects.Visible = True
+    .DrawingObjects.Delete
+    On Error GoTo 0
+End With
+
+' Publish the temp sheet to the temp .htm file that was outlined earlier
+With TempWB.PublishObjects.Add( _
+     SourceType:=xlSourceRange, _
+     Filename:=TempFile, _
+     Sheet:=TempWB.Sheets(1).Name, _
+     Source:=TempWB.Sheets(1).UsedRange.Address, _
+     HtmlType:=xlHtmlStatic)
+    .Publish (True)
+End With
+
+' Read all data from the .htm file into the imageToOutlook subroutine.
+Set fso = CreateObject("Scripting.FileSystemObject")
+Set ts = fso.GetFile(TempFile).OpenAsTextStream(1, -2)
+imageToOutlook = ts.ReadAll
+ts.Close
+imageToOutlook = Replace(imageToOutlook, "align=center x:publishsource=", _
+                      "align=left x:publishsource=")
+
+' Close TempWB.
+TempWB.Close savechanges:=False
+
+' Delete the temp .htm file.
+Kill TempFile
+
+Set ts = Nothing
+Set fso = Nothing
+Set TempWB = Nothing
+
+End Function
