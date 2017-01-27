@@ -1,6 +1,6 @@
 Sub GetFromFolder()
 
-Dim olNS, olApp, olMail, myOlSelection, olFolder, myOlExplorer As Object
+Dim olNS, olApp, olMail, olSelection, olFolder, olExplorer As Object
 Dim mailLoop, mailCount As Double
 Dim todayDate, mailReceived As Date
 Dim ws As Worksheet
@@ -10,15 +10,15 @@ Set olApp = CreateObject("Outlook.Application")
 Set olNS = olApp.GetNameSpace("MAPI")
 Set olFolder = olNS.GetDefaultFolder(olFolderInbox)
 Set olMail = olFolder.Items
-Set myOlExplorer = olApp.ActiveExplorer
-Set myOlSelection = myOlExplorer.Selection
+Set olExplorer = olApp.ActiveExplorer
+Set olSelection = olExplorer.Selection
 Set ws = ActiveSheet
 
 mailCount = olFolder.Items.Count
 todayDate = Date
 
 For mailLoop = mailCount To 1 Step -1
-    With myOlSelection
+    With olSelection
         Set olMail = olFolder.Items(mailLoop)
             mailSubject = olMail.Subject
             mailReceived = Format(olMail.ReceivedTime, "DD/MM/YYYY")
