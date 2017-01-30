@@ -1,10 +1,10 @@
 Sub FauxEmailParse()
 
-Dim olNS, olApp, olMail, olSelection, olFolder, olExplorer, olAttachment, olInspector As Object
+Dim olNS, olApp, olMail, olSelection, olFolder, olExplorer, olAttachment As Object
 Dim mailLoop, mailCount, attachmentCount As Double
 Dim todayDate, mailReceived As Date
 Dim ws As Worksheet
-Dim mailSubject, attachmentName, attachmentDir, myFile As String
+Dim mailSubject, attachmentDir, stringToQuery As String
 
 Set olApp = CreateObject("Outlook.Application")
 Set olNS = olApp.GetNameSpace("MAPI")
@@ -15,6 +15,7 @@ Set olSelection = olExplorer.Selection
 Set ws = ActiveSheet
 
 attachmentDir = "C:\Users\hanson2\Desktop\Macros Under Construction\To Do\Email Parising\AJBell Files\"
+stringToQuery = "AJB bell file"
 mailCount = olFolder.Items.Count
 todayDate = Date
 Application.DisplayAlerts = False
@@ -24,18 +25,22 @@ For mailLoop = 1 To mailCount
         Set olMail = olFolder.Items(mailLoop)
             mailSubject = olMail.Subject
             mailReceived = Format(olMail.ReceivedTime, "DD/MM/YYYY")
-                If mailSubject Like "AJB bell file" Then
-                    If (mailReceived = todayDate) Then
-                        For Each olAttachment In olMail.Attachments
-                            olAttachment.SaveAsFile attachmentDir & olAttachment.Filename
-                                GoTo mailLoop
-                        Next
+                If (mailReceived = todayDate) Then
+                    If InStr(1, mailSubject, stringToQuery, vbTextCompare) <> 0 Then
+                        If olMail.Attachments.Count > 0 Then
+                            For Each olAttachment In olMail.Attachments
+                                olAttachment.SaveAsFile attachmentDir & olAttachment.Filename
+                                    GoTo mailLoopEnd
+                            Next
+                        Else
+                        End If
                     Else
                     End If
                 Else
+                    MsgBox "No email with subject containing  " & stringToQuery & " received on" & mailReceived
                 End If
     End With
 Next mailLoop
-mailLoop:
+mailLoopEnd:
 
 End Sub
