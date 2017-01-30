@@ -14,7 +14,7 @@ Set olExplorer = olApp.ActiveExplorer
 Set olSelection = olExplorer.Selection
 Set ws = ActiveSheet
 
-attachmentDir = "C:\Users\"
+attachmentDir = "C:\Users\hanson2\Desktop\Macros Under Construction\To Do\Email Parising\AJBell Files\"
 mailCount = olFolder.Items.Count
 todayDate = Date
 Application.DisplayAlerts = False
@@ -24,15 +24,12 @@ For mailLoop = 1 To mailCount
         Set olMail = olFolder.Items(mailLoop)
             mailSubject = olMail.Subject
             mailReceived = Format(olMail.ReceivedTime, "DD/MM/YYYY")
-                If mailSubject Like "SUBJECT LINE" Then
+                If mailSubject Like "AJB bell file" Then
                     If (mailReceived = todayDate) Then
-                       If olMail.Attachments.Count <> 0 Then
-                            For Each olAttachment In olMail.Attachments
-                                olAttachment.SaveAsFile attachmentDir & olAttachment.Filename
-                                    GoTo mailLoop
-                            Next
-                        Else
-                        End If
+                        For Each olAttachment In olMail.Attachments
+                            olAttachment.SaveAsFile attachmentDir & olAttachment.Filename
+                                GoTo mailLoop
+                        Next
                     Else
                     End If
                 Else
