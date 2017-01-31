@@ -1,13 +1,20 @@
 Sub BenchMarks()
-
 Application.ScreenUpdating = False
 
-Dim rowCount, createSheets, accountFilter, sheetSums, sheetCopyLoop, dateRow, dateRowLoop, totalValue, totalCount As Double
-Dim sheetArrayString, sheetArrayInt As Variant
+Dim olNS, olApp, olMail, olSelection, olFolder, olExplorer, olAttachment As Object
+Dim rowCount, createSheets, accountFilter, sheetSums, sheetCopyLoop, dateRow, dateRowLoop, totalValue, totalCount, copyToBM As Double
+Dim mailLoop, mailCount, attachmentCount, bmCheck As Double
+Dim sheetArrayString, sheetArrayInt, totalValueArray, totalCountArray As Variant
 Dim shO As Worksheet
-Dim FSwb, BMwb As Workbook
+Dim FSwb, BMwb, TFRwb As Workbook
 Dim rCell, rRng As Range
+Dim TFRwbDate As Date
 Dim FSwbDate As Date
+Dim todayDate As Date
+Dim mailReceived As Date
+Dim mailSubject, tempDir, tempFile, stringToQuery As String
+
+bmCheck = MsgBox("If you already have the Benchmark spreadsheet open please close it. Press Yes when closed", vbYesNo + vbQuestion, "Benchmark File Check")
 
 Set shO = ActiveSheet
 Set FSwb = ActiveWorkbook
@@ -21,20 +28,17 @@ Range("H2").Select
 ActiveCell.FormulaR1C1 = _
     "=CONCATENATE(RIGHT(RC[-1],2),""/"",MID(RC[-1],3,2),""/"",LEFT(RC[-1],2))"
 Selection.AutoFill Destination:=Range("H2:H" & rowCount)
-
-    Columns("H:H").Copy
-    Columns("H:H").Select
-    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-        :=False, Transpose:=False
-        
+Columns("H:H").Copy
+Columns("H:H").Select
+Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+    :=False, Transpose:=False
 Columns("G:G").Delete Shift:=xlToLeft
     
 sheetArrayString = Array("10433442", "47468943", "5614783", "98678152", "47469173", "56143753")
 sheetArrayInt = Array(10433442, 47468943, 5614783, 98678152, 47469173, 56143753)
-
-For createSheets = 0 To 5
-    Sheets.Add.Name = sheetArrayString(createSheets)
-Next createSheets
+    For createSheets = 0 To 5
+        Sheets.Add.Name = sheetArrayString(createSheets)
+    Next createSheets
 
 shO.Move before:=Worksheets(1)
     Rows("1:1").AutoFilter
@@ -71,14 +75,12 @@ For sheetSums = 0 To 5
             Else
             End If
 Next sheetSums
-sheetSums = 0
 
 Workbooks.Open ("\\tdukldsnas01\backoffice\Benchmarks\MI 2016 - 2017\Benchmarks - Reconciliations - v1.xlsx")
 Set BMwb = ActiveWorkbook
 Set rRng = BMwb.Sheets("Reconciliations").Range("A5:A1039")
 
 dateRow = 5
-
 For Each rCell In rRng.Cells
     If rCell = FSwbDate Then Exit For
         dateRow = dateRow + 1
@@ -86,78 +88,90 @@ Next rCell
 
 FSwb.Activate
 
-Sheets(1).Select
-    If Range("A1") <> "" Then
-        rowCount = Range("A65536").End(xlUp).Row
-            totalValue = Range("A" & rowCount - 1).Value
-            totalCount = Range("A" & rowCount).Value
-                BMwb.Activate
-                    Cells(dateRow, 14).Value = totalValue
-                    Cells(dateRow, 8).Value = totalCount
-                        FSwb.Activate
-        Else
-        End If
-        
-Sheets(2).Select
-    If Range("A1") <> "" Then
-        rowCount = Range("A65536").End(xlUp).Row
-            totalValue = Range("A" & rowCount - 1).Value
-            totalCount = Range("A" & rowCount).Value
-                BMwb.Activate
-                    Cells(dateRow, 13).Value = totalValue
-                    Cells(dateRow, 7).Value = totalCount
-                        FSwb.Activate
-        Else
-        End If
-        
-Sheets(3).Select
-    If Range("A1") <> "" Then
-        rowCount = Range("A65536").End(xlUp).Row
-            totalValue = Range("A" & rowCount - 1).Value
-            totalCount = Range("A" & rowCount).Value
-                BMwb.Activate
-                    Cells(dateRow, 12).Value = totalValue
-                    Cells(dateRow, 6).Value = totalCount
-                        FSwb.Activate
-        Else
-        End If
-        
-Sheets(4).Select
-    If Range("A1") <> "" Then
-        rowCount = Range("A65536").End(xlUp).Row
-            totalValue = Range("A" & rowCount - 1).Value
-            totalCount = Range("A" & rowCount).Value
-                BMwb.Activate
-                    Cells(dateRow, 11).Value = totalValue
-                    Cells(dateRow, 5).Value = totalCount
-                        FSwb.Activate
-        Else
-        End If
-        
-Sheets(5).Select
-    If Range("A1") <> "" Then
-        rowCount = Range("A65536").End(xlUp).Row
-            totalValue = Range("A" & rowCount - 1).Value
-            totalCount = Range("A" & rowCount).Value
-                BMwb.Activate
-                    Cells(dateRow, 10).Value = totalValue
-                    Cells(dateRow, 4).Value = totalCount
-                        FSwb.Activate
-        Else
-        End If
-        
-Sheets(6).Select
-    If Range("A1") <> "" Then
-        rowCount = Range("A65536").End(xlUp).Row
-            totalValue = Range("A" & rowCount - 1).Value
-            totalCount = Range("A" & rowCount).Value
-                BMwb.Activate
-                    Cells(dateRow, 9).Value = totalValue
-                    Cells(dateRow, 3).Value = totalCount
-                        FSwb.Activate
-        Else
-        End If
-        
+totalValueArray = Array(14, 13, 12, 11, 10, 9)
+totalCountArray = Array(8, 7, 6, 5, 4, 3)
+sheetArrayString = Array("56143753", "47469173", "98678152", "5614783", "47468943", "10433442")
+    For copyToBM = 0 To 5
+        Sheets(sheetArrayString(copyToBM)).Select
+            If Range("A1") <> "" Then
+                rowCount = Range("A65536").End(xlUp).Row
+                    totalValue = Range("A" & rowCount - 1).Value
+                    totalCount = Range("A" & rowCount).Value
+                        BMwb.Activate
+                            Cells(dateRow, totalValueArray(copyToBM)).Value = totalValue
+                            Cells(dateRow, totalCountArray(copyToBM)).Value = totalCount
+                                FSwb.Activate
+            Else
+            End If
+    Next copyToBM
+
+Set olApp = CreateObject("Outlook.Application")
+Set olNS = olApp.GetNameSpace("MAPI")
+Set olFolder = olNS.GetDefaultFolder(olFolderInbox)
+Set olMail = olFolder.Items
+Set olExplorer = olApp.ActiveExplorer
+Set olSelection = olExplorer.Selection
+
+tempDir = Environ$("temp") & "\"
+stringToQuery = "TD Transfer In File"
+mailCount = olFolder.Items.Count
+todayDate = Date
+Application.DisplayAlerts = False
+
+For mailLoop = 1 To mailCount
+    With olSelection
+        Set olMail = olFolder.Items(mailLoop)
+            mailSubject = olMail.Subject
+            mailReceived = Format(olMail.ReceivedTime, "DD/MM/YYYY")
+                If (mailReceived = todayDate) Then
+                    If InStr(1, mailSubject, stringToQuery, vbTextCompare) <> 0 Then
+                        If olMail.Attachments.Count > 0 Then
+                            For Each olAttachment In olMail.Attachments
+                                tempFile = tempDir & olAttachment.Filename
+                                    olAttachment.SaveAsFile tempFile
+                                    GoTo mailLoopEnd
+                            Next
+                        Else
+                            GoTo reLoop
+                        End If
+                    Else
+                    End If
+                Else
+                    MsgBox "No email with subject containing " & stringToQuery & " received on " & mailReceived & "." & Chr(13) & Chr(13) & "Macro will end." & Chr(13) & Chr(13) & "FileShare figures have saved."
+                        GoTo endSub
+                End If
+    End With
+reLoop:
+Next mailLoop
+mailLoopEnd:
+
+Workbooks.Open tempFile
+Set TFRwb = ActiveWorkbook
+TFRwb.Activate
+TFRwbDate = Date
+
+Cells.Replace What:="£", Replacement:="", LookAt:=xlPart, _
+        SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+        ReplaceFormat:=False
+
+Range("F1").FormulaR1C1 = "=COUNT(C[-5])"
+Range("G1").FormulaR1C1 = "=SUM(C[-4])"
+totalValue = Range("G1").Value
+totalCount = Range("F1").Value
+
+BMwb.Activate
+dateRow = 5
+    For Each rCell In rRng.Cells
+        If rCell = TFRwbDate Then Exit For
+            dateRow = dateRow + 1
+    Next rCell
+        Cells(dateRow, 25).Value = totalValue
+        Cells(dateRow, 24).Value = totalCount
+
+TFRwb.Close False
+Kill tempFile
+
+endSub:
 BMwb.Save
 BMwb.Close
 
