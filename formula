@@ -1,2 +1,0 @@
-Date reformat from 170109 to 09/01/2017
-=CONCATENATE(RIGHT(target,2),"/",MID(target,3,2),"/","20",LEFT(target,2))
